@@ -122,7 +122,7 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa�
             training_idx, test_idx = indices[:4748], indices[4748:]
             training_x, test_x = X[training_idx,:], X[test_idx,:]
             training_y1, test_y1 = Y1[training_idx], Y1[test_idx]
-            training_y2, test_y2 = Y2[training_idx], Y2[test_idx]
+            training_y2, test_y2 = Y2[training_idx], Y2[test_idx]graph_error_models(2,2,test_y1,y_pred)
         ```
     - El primer modelo que aplicamos es una red neuronal. Iniciamos los valores necesarios para el modelo.
         ```python
@@ -234,6 +234,14 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa�
              print("Accuracy:",metrics.accuracy_score(test_y1, y_pred))
         ```
         
+    - Graficamos los verdaderos positivos y falsos positivos de cada modelo.
+        ```python
+        
+             graph_error_models(test_y1,classification) ## Modelo red neuronal
+             graph_error_models(test_y1,y_predsvm)  ## Modelo SVM
+             graph_error_models(test_y1,y_pred)  ## Modelo NB
+        ```
+    
 - md_utils : 
     - graph_error_models : Esta función genera una gráfica por cada tópico que se encuentra en la data de prueba. Cada grafica nos muestra los verdaderos positvos y los falsos positivos.
     - category_to_target : Esta función se encarga de generar las clases Y, Y1 que seran usadas en los modelos segun el tipo de variable que requiera.
