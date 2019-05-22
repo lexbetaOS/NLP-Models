@@ -93,7 +93,7 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa√
             #data_lemmatized = lemmatization(data_words_bigrams,nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
             data_lemmatized = lemmatization(data_words_trigrams,nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
         ```
-    - Creamos el diccionario 
+    - Creamos el diccionario de toda la data lematizada, creamos el bag of words de la data en corpus. 
         ```python
             # Create Dictionary
             id2word = corpora.Dictionary(data_lemmatized)
@@ -104,6 +104,11 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa√
             # Term Document Frequency
             corpus = [id2word.doc2bow(text) for text in texts]
 
+        ```
+    - Aplicamos TF-IDF.
+        ```python
+            tfidf = models.TfidfModel(corpus)
+            corpus = tfidf[corpus]
         ```
 - md_utils : 
     - graph_error_models : Esta funci√≥n genera una gr√°fica por cada t√≥pico que se encuentra en la data de prueba. Cada grafica nos muestra los verdaderos positvos y los falsos positivos.
