@@ -69,7 +69,19 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa�
             stopSpanish = set(stopwords_es.union(stopwords_es_sw))
             stopSpanish = list(stopSpanish)
         ```
-    
+    - Realizamos la tokenizacion del campo Asunto mediante la funcion sent_to_words que esta definida en md_utils.
+        ```python
+            data_words = list(sent_to_words(data1))
+        ```
+    - Construimos los bigramas y trigramas de la lista tokenizada anteriormente.
+        ```python
+            bigram = gensim.models.Phrases(data_words, min_count=5, threshold=100)
+            trigram = gensim.models.Phrases(bigram[data_words], threshold=100)  
+
+            bigram_mod = gensim.models.phrases.Phraser(bigram)
+            trigram_mod = gensim.models.phrases.Phraser(trigram)
+        ```
+        
 - md_utils : 
     - graph_error_models : Esta función genera una gráfica por cada tópico que se encuentra en la data de prueba. Cada grafica nos muestra los verdaderos positvos y los falsos positivos.
     - category_to_target : Esta función se encarga de generar las clases Y, Y1 que seran usadas en los modelos segun el tipo de variable que requiera.
