@@ -73,7 +73,7 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa�
         ```python
             data_words = list(sent_to_words(data1))
         ```
-    - Construimos los bigramas y trigramas de la lista tokenizada anteriormente.
+    - Los bigramas son dos palabras que ocurren juntas frecuentemente. Trigramas son tres palabras que ocurren frecuentemente. Construimos los modelos bigramas y trigramas de la lista tokenizada anteriormente.
         ```python
             bigram = gensim.models.Phrases(data_words, min_count=5, threshold=100)
             trigram = gensim.models.Phrases(bigram[data_words], threshold=100)  
@@ -81,7 +81,30 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa�
             bigram_mod = gensim.models.phrases.Phraser(bigram)
             trigram_mod = gensim.models.phrases.Phraser(trigram)
         ```
-        
+     - Una vez creado el modelo bigram y trigram, llamamos a las funciones definidas en md_utils para eliminar los stopwords, aplicar trigram y lemmatizacion manteniendo los sustantivos, adjetivos, verbos y advervios. 
+        ```python
+            data_words_nostops = remove_stopwords(data_words,stopSpanish)
+            
+            #data_words_bigrams = make_bigrams(data_words_nostops,bigram_mod)
+            data_words_trigrams = make_trigrams(data_words_nostops,bigram_mod,trigram_mod)
+
+            nlp = spacy.load('es_core_news_sm', disable=['parser', 'ner'])
+
+            #data_lemmatized = lemmatization(data_words_bigrams,nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
+            data_lemmatized = lemmatization(data_words_trigrams,nlp, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
+        ```
+    - Creamos el diccionario 
+        ```python
+            # Create Dictionary
+            id2word = corpora.Dictionary(data_lemmatized)
+
+            # Create Corpus
+            texts = data_lemmatized
+
+            # Term Document Frequency
+            corpus = [id2word.doc2bow(text) for text in texts]
+
+        ```
 - md_utils : 
     - graph_error_models : Esta función genera una gráfica por cada tópico que se encuentra en la data de prueba. Cada grafica nos muestra los verdaderos positvos y los falsos positivos.
     - category_to_target : Esta función se encarga de generar las clases Y, Y1 que seran usadas en los modelos segun el tipo de variable que requiera.
