@@ -7,7 +7,7 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa�
 - Python 3+
 - Pandas
 - Numpy 1+
-- tensorflow
+- tensorflow 1+
 - gensim 3+
 
 ### Usage
@@ -109,6 +109,12 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa�
         ```python
             tfidf = models.TfidfModel(corpus)
             corpus = tfidf[corpus]
+        ```
+    - Para aplicar los modelos de clasificación supervisada necesitamos dar ciertos formatos o tipos a los variables .
+        ```python
+            X=corpus_to_input(corpus,id2word)
+            Y = df1.Clasificacion.values.tolist()
+            Y1,Y2=category_to_target(Y)
         ```
 - md_utils : 
     - graph_error_models : Esta función genera una gráfica por cada tópico que se encuentra en la data de prueba. Cada grafica nos muestra los verdaderos positvos y los falsos positivos.
