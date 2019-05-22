@@ -21,10 +21,10 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa�
         ``` 
     - Revisamos la cantidad de datos por cada clase que existe en el dataset.
         ```python
-            c1=sum(df1['Clasificacion']=='Consulta')
-            c2=sum(df1['Clasificacion']=='Cambio de plan')
-            c3=sum(df1['Clasificacion']=='Creditos')
-            c4=sum(df1['Clasificacion']=='Excepcion')
+            c1=sum(df1['Clasificacion'] == 'Consulta')
+            c2=sum(df1['Clasificacion'] == 'Cambio de plan')
+            c3=sum(df1['Clasificacion'] == 'Creditos')
+            c4=sum(df1['Clasificacion'] == 'Excepcion')
 
             print("Total de la clase \'Consulta\':",c1)
             print("Total de la clase \'Cambio de plan\':",c2)
@@ -110,11 +110,19 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa�
             tfidf = models.TfidfModel(corpus)
             corpus = tfidf[corpus]
         ```
-    - Para aplicar los modelos de clasificación supervisada necesitamos dar ciertos formatos o tipos a los variables .
+    - Para aplicar los modelos de clasificación supervisada necesitamos preparar las variables segun el tipo de variable que el modelo solicite. Llamamos a las funciones definidas en md_utils.
         ```python
-            X=corpus_to_input(corpus,id2word)
+            X = corpus_to_input(corpus,id2word)
             Y = df1.Clasificacion.values.tolist()
             Y1,Y2=category_to_target(Y)
+        ```
+    - Con la data preparada obtenemos el training-set y el test-set de forma aleatoria para aplicar los modelos.
+        ```python
+            indices = np.random.permutation(X.shape[0])
+            training_idx, test_idx = indices[:4748], indices[4748:]
+            training_x, test_x = X[training_idx,:], X[test_idx,:]
+            training_y1, test_y1 = Y1[training_idx], Y1[test_idx]
+            training_y2, test_y2 = Y2[training_idx], Y2[test_idx]
         ```
 - md_utils : 
     - graph_error_models : Esta función genera una gráfica por cada tópico que se encuentra en la data de prueba. Cada grafica nos muestra los verdaderos positvos y los falsos positivos.
