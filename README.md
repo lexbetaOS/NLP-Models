@@ -124,6 +124,116 @@ El presente notebook tiene como objetivo analizar un dataset de correos en espa�
             training_y1, test_y1 = Y1[training_idx], Y1[test_idx]
             training_y2, test_y2 = Y2[training_idx], Y2[test_idx]
         ```
+    - El primer modelo que aplicamos es una red neuronal. Iniciamos los valores necesarios para el modelo.
+        ```python
+            # Parameters
+            total_words=len(id2word)
+            learning_rate = 0.01
+            training_epochs = 10
+            batch_size = 150
+            display_step = 1
+
+            # Network Parameters
+            n_hidden_1 = 100      # 1st layer number of features
+            n_hidden_2 = 100       # 2nd layer number of features
+            n_input = total_words # Words in vocab
+            n_classes = 4         # Categories: graphics, sci.space and baseball
+
+            input_tensor = tf.placeholder(tf.float32,[None, n_input],name="input")
+            output_tensor = tf.placeholder(tf.float32,[None, n_classes],name="output") 
+
+            # Store layers weight & bias
+            weights = {
+                'h1': tf.Variable(tf.random_normal([n_input, n_hidden_1])),
+                'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
+                'out': tf.Variable(tf.random_normal([n_hidden_2, n_classes]))
+            }
+            biases = {
+                'b1': tf.Variable(tf.random_normal([n_hidden_1])),
+                'b2': tf.Variable(tf.random_normal([n_hidden_2])),
+                'out': tf.Variable(tf.random_normal([n_classes]))
+            }
+
+        ```
+        
+    - Construimos el modelo.
+        ```python
+            prediction = multilayer_perceptron_nn(input_tensor, weights, biases)
+
+            # Define loss and optimizer
+            loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=output_tensor))
+            optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss)
+
+            # Initializing the variables
+            init = tf.global_variables_initializer()
+
+            # [NEW] Add ops to save and restore all the variables
+            saver = tf.train.Saver()
+        ```
+    - Entrenamos el modelo.
+        ```python
+            # Launch the graph
+            with tf.Session() as sess:
+            sess.run(init)
+
+            # Training cycle
+            for epoch in range(training_epochs):
+                avg_cost = 0.
+                total_batch = int(len(training_x)/batch_size)
+                # Loop over all batches
+                for i in range(total_batch):
+                    batch_x = training_x[i*batch_size:i*batch_size+batch_size]
+                    batch_y = training_y2[i*batch_size:i*batch_size+batch_size]
+                    # Run optimization op (backprop) and cost op (to get loss value)
+                    c,_ = sess.run([loss,optimizer], feed_dict={input_tensor: batch_x,output_tensor:batch_y})
+                    # Compute average loss
+                    avg_cost += c / total_batch
+                 # Display logs per epoch step
+                 if epoch % display_step == 0:
+                    print("Epoch:", '%04d' % (epoch+1), "loss=","{:.9f}".format(avg_cost))
+             print("Optimization Finished!")
+
+             # Test model
+             correct_prediction = tf.equal(tf.argmax(prediction, 1), tf.argmax(output_tensor, 1))
+             # Calculate accuracy
+             accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+             total_test_data = len(test_x)
+             batch_x_test = test_x
+             batch_y_test = test_y2
+             print("Accuracy:", accuracy.eval({input_tensor: batch_x_test, output_tensor: batch_y_test}))
+    
+             # [NEW] Save the variables to disk
+             save_path = saver.save(sess, "/content/gdrive/My Drive/Colab Notebooks/lda2vec/out3/model.ckpt")
+             print("Model saved in path: %s" % save_path)
+        ```
+    - El segundo modelo que aplicamos es SVM.
+        ```python
+             clf_top=svm.SVC(kernel='linear',C=0.1,decision_function_shape='ovr')
+             clf_top.fit(training_x,training_y1)
+
+             y_predsvm = clf_top.predict(test_x)
+
+             train_acc=clf_top.score(training_x,training_y1)
+             test_acc=clf_top.score(test_x,test_y1)
+
+             print(train_acc*100)
+             print(test_acc*100)
+        ```
+    - El tercer modelo que aplicamos es Naive Bayes.
+        ```python
+             #Create a Gaussian Classifier
+             gnb = GaussianNB()
+
+             #Train the model using the training sets
+             gnb.fit(training, training_y1)
+
+             #Predict the response for test dataset
+             y_pred = gnb.predict(test)
+             
+             # Model Accuracy, how often is the classifier correct?
+             print("Accuracy:",metrics.accuracy_score(test_y1, y_pred))
+        ```
+        
 - md_utils : 
     - graph_error_models : Esta función genera una gráfica por cada tópico que se encuentra en la data de prueba. Cada grafica nos muestra los verdaderos positvos y los falsos positivos.
     - category_to_target : Esta función se encarga de generar las clases Y, Y1 que seran usadas en los modelos segun el tipo de variable que requiera.
